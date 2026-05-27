@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+XiaoWei&family=Cormorant+Garamond:wght@400;500;600&display=swap');
+
+:root {
+  --color-deep-space: #0a0e1a;
+  --color-mist-white: #f5f5f7;
+  --color-moonlight: #e8dcc4;
+  --color-accent: #6b7fd7;
+  --color-accent-dark: #5a6db8;
+  --color-booth-shadow: #4a5a8a;
+
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+}
+
+body {
+  background-color: var(--color-deep-space);
+  color: var(--color-mist-white);
+  overflow-x: hidden;
+}
+
+/* 文字逐字浮现 */
+.char {
+  opacity: 0;
+  display: inline-block;
+}
+
+/* 按钮基础样式 */
+@layer components {
+  .btn-primary {
+    @apply px-8 py-4 rounded-full bg-accent text-white font-medium
+           transition-all duration-150 ease-out
+           hover:scale-105 hover:shadow-lg hover:shadow-accent/40
+           active:scale-95
+           focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-deep-space;
+    will-change: transform;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-full bg-booth-shadow text-mist-white font-medium
+           transition-all duration-150 ease-out
+           hover:scale-105 hover:bg-accent
+           active:scale-95;
+    will-change: transform;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg bg-booth-shadow/50 text-mist-white
+           border border-accent/30
+           transition-all duration-200
+           placeholder:text-mist-white/40
+           focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30;
+  }
+
+  .card-base {
+    @apply rounded-2xl bg-deep-space/80 backdrop-blur-sm
+           border border-accent/20
+           shadow-xl shadow-black/20;
+  }
+}
+
+/* 动画性能优化 */
+.performance-optimized {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Canvas背景 */
+.canvas-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 内容层 */
+.content-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-deep-space);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 3px;
+}
+
+/* 选择样式 */
+::selection {
+  background: var(--color-accent);
+  color: var(--color-mist-white);
+}
