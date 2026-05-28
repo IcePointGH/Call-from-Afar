@@ -28,6 +28,10 @@ export const CallPage = () => {
 
   const { start: startTimer, stop: stopTimer } = useTimer(updateDuration, 1000);
 
+  const handleEnterBooth = useCallback(() => {
+    setBoothStage("inside");
+  }, []);
+
   const handleConnect = useCallback(() => {
     setBoothStage("dialing");
     setShowEndMessage(false);
@@ -107,8 +111,19 @@ export const CallPage = () => {
           ) : boothStage === "idle" ? (
             <div className="text-center">
               <p className="text-mist-white/60 text-sm mb-6">
-                点击按钮，开始跨时空通话
+                先推开门，进入时空电话亭
               </p>
+              <TouchableButton onClick={handleEnterBooth}>
+                进入电话亭
+              </TouchableButton>
+            </div>
+          ) : boothStage === "inside" ? (
+            <div className="text-center">
+              <FadeIn>
+                <p className="text-mist-white/60 text-sm mb-6">
+                  拿起听筒，接通想念的另一端
+                </p>
+              </FadeIn>
               <TouchableButton onClick={handleConnect}>
                 接通时空
               </TouchableButton>
