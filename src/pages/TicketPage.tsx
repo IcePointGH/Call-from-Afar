@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { StarBackground } from "../components/StarBackground";
 import { AmbientToggle } from "../components/AmbientToggle";
 import { TicketCard } from "../components/TicketCard";
-import { PageTransition, FadeIn } from "../components/PageTransition";
+import { TicketReveal } from "../components/ticket/TicketReveal";
+import { TouchableButton } from "../components/TouchableButton";
+import { PageTransition } from "../components/PageTransition";
 import { useAppStore, Ticket } from "../store/useAppStore";
 import { getMessageByCategory } from "../data/messages";
 
@@ -47,20 +49,21 @@ export const TicketPage = () => {
       <AmbientToggle />
 
       <PageTransition className="content-layer min-h-screen flex flex-col items-center justify-center px-4 py-12">
-        <FadeIn delay={0.1} className="w-full flex flex-col items-center">
+        <TicketReveal>
           <h1 className="font-serif text-2xl text-moonlight text-center mb-8">
             专属纪念票根
           </h1>
 
           <TicketCard ticket={ticket} />
 
-          <button
+          <TouchableButton
             onClick={handleBack}
-            className="mt-8 text-mist-white/50 hover:text-mist-white/70 transition-colors text-sm"
+            variant="ghost"
+            className="mt-8"
           >
             返回首页
-          </button>
-        </FadeIn>
+          </TouchableButton>
+        </TicketReveal>
       </PageTransition>
     </>
   );

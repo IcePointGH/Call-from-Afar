@@ -1,7 +1,7 @@
 import { useRef, useCallback } from "react";
 import html2canvas from "html2canvas";
 import { Ticket } from "../store/useAppStore";
-import { DownloadIcon, PrintIcon, ShareIcon } from "./Icons";
+import { TicketActions } from "./ticket/TicketActions";
 import { TicketIllustration } from "./TicketIllustration";
 import { TicketBorder } from "./TicketBorder";
 
@@ -205,23 +205,7 @@ export const TicketCard = ({ ticket, onSave }: TicketCardProps) => {
         </TicketBorder>
       </div>
 
-      {/* 操作按钮 */}
-      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-        <button onClick={handleSave} className="btn-primary flex-1 flex items-center justify-center gap-2">
-          <DownloadIcon />
-          保存图片
-        </button>
-
-        <button onClick={handlePrint} className="btn-secondary flex-1 flex items-center justify-center gap-2">
-          <PrintIcon />
-          打印票根
-        </button>
-
-        <button onClick={handleShare} className="btn-secondary flex-1 flex items-center justify-center gap-2">
-          <ShareIcon />
-          分享
-        </button>
-      </div>
+      <TicketActions onSave={handleSave} onPrint={handlePrint} onShare={handleShare} />
     </div>
   );
 };
