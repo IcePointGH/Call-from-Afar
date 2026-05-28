@@ -2,12 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { StarBackground } from "../components/StarBackground";
 import { AmbientToggle } from "../components/AmbientToggle";
-import { PhoneBoothIllustration } from "../components/PhoneBoothIllustration";
-import { StarLineEffect } from "../components/StarLineEffect";
-import { RippleEffect } from "../components/RippleEffect";
-import { CallActiveRing } from "../components/CallActiveRing";
+import { PhoneBoothStage, PhoneBoothStageName } from "../components/scene/PhoneBoothStage";
 import { CountdownTimer } from "../components/CountdownTimer";
 import { PageTransition, FadeIn } from "../components/PageTransition";
+import { TouchableButton } from "../components/TouchableButton";
 import { useAppStore } from "../store/useAppStore";
 import { useTimer } from "../hooks/useTimer";
 
@@ -26,16 +24,17 @@ export const CallPage = () => {
   } = useAppStore();
 
   const [showEndMessage, setShowEndMessage] = useState(false);
-  const [boothState, setBoothState] = useState<"idle" | "connecting" | "connected">("idle");
+  const [boothStage, setBoothStage] = useState<PhoneBoothStageName>("idle");
 
   const { start: startTimer, stop: stopTimer } = useTimer(updateDuration, 1000);
 
   const handleConnect = useCallback(() => {
-    setBoothState("connecting");
+    setBoothStage("dialing");
+    setShowEndMessage(false);
     startCall();
 
     setTimeout(() => {
-      setBoothState("connected");
+      setBoothStage("connected");
       setIsConnected(true);
       startTimer();
     }, 900);
@@ -44,8 +43,11 @@ export const CallPage = () => {
   const handleEnd = useCallback(() => {
     stopTimer();
     endCall();
-    setShowEndMessage(true);
-    setBoothState("idle");
+    setBoothStage("ending");
+
+    setTimeout(() => {
+      setShowEndMessage(true);
+    }, 520);
   }, [stopTimer, endCall]);
 
   const handleContinue = useCallback(() => {
@@ -73,13 +75,10 @@ export const CallPage = () => {
         <div className="relative flex flex-col items-center">
           {/* 电话亭插画 */}
           <div className="relative mb-8">
-            <PhoneBoothIllustration state={boothState} />
-            <StarLineEffect isActive={boothState === "connecting"} />
-            <RippleEffect isActive={boothState === "connecting"} />
-            <CallActiveRing isActive={isConnected} />
+            <PhoneBoothStage stage={boothStage} />
 
             {/* 连接状态文字 */}
-            {boothState === "connecting" && (
+            {boothStage === "dialing" && (
               <FadeIn className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-mist-white/60 text-sm whitespace-nowrap">
                 正在接通时空...
               </FadeIn>
@@ -100,19 +99,19 @@ export const CallPage = () => {
               </FadeIn>
 
               <div className="mt-12">
-                <button onClick={handleEnd} className="btn-secondary">
+                <TouchableButton onClick={handleEnd} variant="secondary">
                   结束通话
-                </button>
+                </TouchableButton>
               </div>
             </div>
-          ) : boothState === "idle" ? (
+          ) : boothStage === "idle" ? (
             <div className="text-center">
               <p className="text-mist-white/60 text-sm mb-6">
                 点击按钮，开始跨时空通话
               </p>
-              <button onClick={handleConnect} className="btn-primary">
+              <TouchableButton onClick={handleConnect}>
                 接通时空
-              </button>
+              </TouchableButton>
             </div>
           ) : null}
         </div>
@@ -134,9 +133,9 @@ export const CallPage = () => {
                 {callDuration % 60}秒
               </p>
 
-              <button onClick={handleContinue} className="btn-primary">
+              <TouchableButton onClick={handleContinue}>
                 查看纪念票根
-              </button>
+              </TouchableButton>
             </FadeIn>
           </div>
         )}
