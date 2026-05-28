@@ -4,6 +4,7 @@ import { LoadingOverlay } from "../components/LoadingOverlay";
 import { StarBackground } from "../components/StarBackground";
 import { AmbientToggle } from "../components/AmbientToggle";
 import { FadeIn } from "../components/PageTransition";
+import { TouchableButton } from "../components/TouchableButton";
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -37,7 +38,9 @@ export const HomePage = () => {
             </p>
           </div>
 
-          <button onClick={handleStart} className="btn-primary text-lg">开启时空通话</button>
+          <TouchableButton onClick={handleStart} className="text-lg">
+            开启时空通话
+          </TouchableButton>
 
         </FadeIn>
       </main>

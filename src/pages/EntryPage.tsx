@@ -5,6 +5,7 @@ import { AmbientToggle } from "../components/AmbientToggle";
 import { CategorySelect } from "../components/CategorySelect";
 import { PrivacyModal } from "../components/PrivacyModal";
 import { PageTransition, FadeIn } from "../components/PageTransition";
+import { TouchableButton } from "../components/TouchableButton";
 import { useAppStore } from "../store/useAppStore";
 
 export const EntryPage = () => {
@@ -89,22 +90,17 @@ export const EntryPage = () => {
             </div>
 
             <div className="mt-8 space-y-3">
-              <button
-                onClick={handleSubmit}
-                disabled={!isValid}
-                className={`btn-primary w-full ${
-                  !isValid ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
+              <TouchableButton onClick={handleSubmit} disabled={!isValid} fullWidth>
                 进入通话
-              </button>
+              </TouchableButton>
 
-              <button
+              <TouchableButton
                 onClick={() => navigate("/")}
-                className="w-full py-3 text-mist-white/50 hover:text-mist-white/70 transition-colors text-sm"
+                variant="ghost"
+                fullWidth
               >
                 返回首页
-              </button>
+              </TouchableButton>
             </div>
           </div>
         </FadeIn>
