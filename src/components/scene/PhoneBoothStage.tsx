@@ -186,9 +186,18 @@ export const PhoneBoothStage = ({
             transition={allowAnimation ? motionSprings.gentle : { duration: motionDurations.instant }}
           />
 
-          <line x1="100" y1="98" x2="100" y2="264" stroke="#6b7fd7" strokeWidth="4" />
-          <line x1="48" y1="164" x2="152" y2="164" stroke="#6b7fd7" strokeWidth="4" />
-          <line x1="48" y1="204" x2="152" y2="204" stroke="#6b7fd7" strokeWidth="3" opacity="0.75" />
+          <motion.g
+            initial={false}
+            animate={{
+              opacity: isInside ? 0.22 : 1,
+              x: isInside ? [-5, 0] : 0,
+            }}
+            transition={allowAnimation ? motionSprings.gentle : { duration: motionDurations.instant }}
+          >
+            <line x1="100" y1="98" x2="100" y2="264" stroke="#6b7fd7" strokeWidth="4" />
+            <line x1="48" y1="164" x2="152" y2="164" stroke="#6b7fd7" strokeWidth="4" />
+            <line x1="48" y1="204" x2="152" y2="204" stroke="#6b7fd7" strokeWidth="3" opacity="0.75" />
+          </motion.g>
 
           <path
             d="M70 118 L92 106"
@@ -213,9 +222,11 @@ export const PhoneBoothStage = ({
             }}
             transition={allowAnimation ? motionSprings.gentle : { duration: motionDurations.instant }}
           >
-            <rect x="66" y="118" width="68" height="96" rx="10" fill="#10182f" />
-            <rect x="74" y="136" width="52" height="12" rx="4" fill="#e8dcc4" opacity="0.82" />
-            <rect x="80" y="154" width="40" height="6" rx="3" fill="#6b7fd7" opacity="0.9" />
+            <rect x="60" y="112" width="80" height="114" rx="12" fill="#0d142a" />
+            <rect x="66" y="119" width="68" height="100" rx="8" fill="#121d3a" />
+            <rect x="72" y="137" width="56" height="14" rx="4" fill="#e8dcc4" opacity="0.84" />
+            <rect x="78" y="156" width="44" height="7" rx="3.5" fill="#6b7fd7" opacity="0.95" />
+            <rect x="82" y="130" width="36" height="3" rx="1.5" fill="#f5f5f7" opacity="0.2" />
 
             {[0, 1, 2].map((row) =>
               [0, 1, 2].map((col) => (
@@ -245,34 +256,35 @@ export const PhoneBoothStage = ({
               initial={false}
               animate={{
                 y: receiverY[stage],
-                x: isDialing ? -2 : 0,
-                rotate: isDialing ? -7 : isEnding ? 4 : 0,
+                x: isDialing ? -1 : 0,
+                rotate: isDialing ? -5 : isEnding ? 3 : 0,
               }}
               style={{ originX: "100px", originY: "122px" }}
               transition={allowAnimation ? motionSprings.tactile : { duration: motionDurations.instant }}
             >
+              <rect x="73" y="115" width="54" height="15" rx="7.5" fill="#e8dcc4" />
+              <circle cx="75" cy="122.5" r="8.5" fill="#e8dcc4" />
+              <circle cx="125" cy="122.5" r="8.5" fill="#e8dcc4" />
+              <rect x="84" y="120" width="32" height="5" rx="2.5" fill="#f5f5f7" opacity="0.24" />
               <path
-                d="M69 125 C72 111 84 106 97 110 L108 114 C114 116 116 124 112 129 L106 137 C102 143 94 143 89 138 L86 135 C83 132 80 133 77 137 L72 144 C68 149 60 147 59 141 C58 135 62 128 69 125 Z"
-                fill="#e8dcc4"
-              />
-              <path
-                d="M106 137 C117 146 126 157 130 172"
+                d="M120 130 C128 138 133 151 130 166 C127 178 116 182 108 175"
                 stroke="#e8dcc4"
-                strokeWidth="3"
+                strokeWidth="2.5"
                 strokeLinecap="round"
-                strokeDasharray="2 5"
-                opacity="0.65"
+                strokeDasharray="1 6"
+                opacity="0.68"
                 fill="none"
               />
             </motion.g>
 
             <path
-              d="M86 224 C92 232 108 232 114 224"
+              d="M86 231 C92 239 108 239 114 231"
               stroke="#e8dcc4"
               strokeWidth="3"
               strokeLinecap="round"
               opacity="0.74"
             />
+            <rect x="86" y="205" width="28" height="6" rx="3" fill="#e8dcc4" opacity="0.45" />
           </motion.g>
 
           {!isInside && (
