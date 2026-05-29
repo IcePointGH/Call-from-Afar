@@ -61,9 +61,14 @@ export const TicketPage = () => {
 
       <PageTransition className="content-layer flex min-h-screen flex-col items-center justify-center px-4 py-12">
         <TicketReveal>
-          <h1 className="mb-8 text-center font-serif text-2xl text-moonlight">
-            专属纪念票根
-          </h1>
+          <div className="mb-8 text-center">
+            <p className="mb-2 text-xs uppercase tracking-[0.28em] text-accent/70">
+              Printed Keepsake
+            </p>
+            <h1 className="font-serif text-3xl text-moonlight">
+              专属纪念票根
+            </h1>
+          </div>
 
           <TicketCard ticket={ticket} />
 
