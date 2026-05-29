@@ -9,14 +9,25 @@ import { PageTransition } from "../components/PageTransition";
 import { useAppStore, Ticket } from "../store/useAppStore";
 import { getMessageByCategory } from "../data/messages";
 
+const formatTimestamp = (date: Date) =>
+  `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date
+    .getHours()
+    .toString()
+    .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+
 export const TicketPage = () => {
   const navigate = useNavigate();
-  const { userNickname, targetCategory, targetNickname, callDuration, addToHistory, resetCallState } =
-    useAppStore();
+  const {
+    userNickname,
+    targetCategory,
+    targetNickname,
+    callDuration,
+    addToHistory,
+    resetCallState,
+  } = useAppStore();
 
   const ticket = useMemo<Ticket>(() => {
     const now = new Date();
-    const timestamp = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
 
     return {
       id: Date.now().toString(),
@@ -24,7 +35,7 @@ export const TicketPage = () => {
       targetCategory,
       targetNickname: targetNickname || "ta",
       duration: callDuration,
-      timestamp,
+      timestamp: formatTimestamp(now),
       message: getMessageByCategory(targetCategory),
     };
   }, [userNickname, targetCategory, targetNickname, callDuration]);
@@ -48,9 +59,9 @@ export const TicketPage = () => {
       <StarBackground />
       <AmbientToggle />
 
-      <PageTransition className="content-layer min-h-screen flex flex-col items-center justify-center px-4 py-12">
+      <PageTransition className="content-layer flex min-h-screen flex-col items-center justify-center px-4 py-12">
         <TicketReveal>
-          <h1 className="font-serif text-2xl text-moonlight text-center mb-8">
+          <h1 className="mb-8 text-center font-serif text-2xl text-moonlight">
             专属纪念票根
           </h1>
 

@@ -1,11 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { StarBackground } from "../components/StarBackground";
 import { AmbientToggle } from "../components/AmbientToggle";
-import { PhoneBoothStage, PhoneBoothStageName } from "../components/scene/PhoneBoothStage";
+import {
+  PhoneBoothStage,
+  PhoneBoothStageName,
+} from "../components/scene/PhoneBoothStage";
 import { CountdownTimer } from "../components/CountdownTimer";
 import { PageTransition, FadeIn } from "../components/PageTransition";
 import { TouchableButton } from "../components/TouchableButton";
+import { TicketPrinter } from "../components/ticket/TicketPrinter";
 import { useAppStore } from "../store/useAppStore";
 import { useTimer } from "../hooks/useTimer";
 
@@ -23,7 +27,7 @@ export const CallPage = () => {
     setIsConnected,
   } = useAppStore();
 
-  const [showEndMessage, setShowEndMessage] = useState(false);
+  const [showPrinter, setShowPrinter] = useState(false);
   const [boothStage, setBoothStage] = useState<PhoneBoothStageName>("idle");
 
   const { start: startTimer, stop: stopTimer } = useTimer(updateDuration, 1000);
@@ -34,10 +38,10 @@ export const CallPage = () => {
 
   const handleConnect = useCallback(() => {
     setBoothStage("dialing");
-    setShowEndMessage(false);
+    setShowPrinter(false);
     startCall();
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       setBoothStage("connected");
       setIsConnected(true);
       startTimer();
@@ -45,16 +49,17 @@ export const CallPage = () => {
   }, [startCall, setIsConnected, startTimer]);
 
   const handleEnd = useCallback(() => {
+    updateDuration();
     stopTimer();
     endCall();
     setBoothStage("ending");
 
-    setTimeout(() => {
-      setShowEndMessage(true);
+    window.setTimeout(() => {
+      setShowPrinter(true);
     }, 520);
-  }, [stopTimer, endCall]);
+  }, [updateDuration, stopTimer, endCall]);
 
-  const handleContinue = useCallback(() => {
+  const handleOpenTicket = useCallback(() => {
     navigate("/ticket");
   }, [navigate]);
 
@@ -75,29 +80,26 @@ export const CallPage = () => {
       <StarBackground />
       <AmbientToggle />
 
-      <PageTransition className="content-layer min-h-screen flex flex-col items-center justify-center px-4">
+      <PageTransition className="content-layer flex min-h-screen flex-col items-center justify-center px-4">
         <div className="relative flex flex-col items-center">
-          {/* 电话亭插画 */}
           <div className="relative mb-8">
             <PhoneBoothStage stage={boothStage} />
 
-            {/* 连接状态文字 */}
             {boothStage === "dialing" && (
-              <FadeIn className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-mist-white/60 text-sm whitespace-nowrap">
+              <FadeIn className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm text-mist-white/60">
                 正在接通时空...
               </FadeIn>
             )}
           </div>
 
-          {/* 通话状态 */}
           {isConnected ? (
             <div className="text-center">
               <FadeIn>
-                <p className="text-mist-white/60 text-sm mb-4">
+                <p className="mb-4 text-sm text-mist-white/60">
                   时空已接通，你可以尽情诉说
                 </p>
                 <CountdownTimer duration={callDuration} isActive={isConnected} />
-                <p className="text-moonlight/50 text-xs mt-2">
+                <p className="mt-2 text-xs text-moonlight/50">
                   对 {targetNickname} 的思念
                 </p>
               </FadeIn>
@@ -108,9 +110,28 @@ export const CallPage = () => {
                 </TouchableButton>
               </div>
             </div>
+          ) : showPrinter ? (
+            <FadeIn className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-deep-space/92" />
+              <div className="relative w-full max-w-md rounded-2xl border border-accent/25 bg-call-panel/70 px-6 py-8 shadow-[0_30px_90px_rgba(2,4,10,0.45)] backdrop-blur-md">
+                <div className="mb-6 text-center">
+                  <p className="mb-2 text-xl text-moonlight">你的心里话</p>
+                  <p className="text-xl text-moonlight">时光已经收妥</p>
+                  <p className="mt-4 text-sm text-mist-white/55">
+                    现在从电话亭里打印一张专属纪念票根。
+                  </p>
+                </div>
+
+                <TicketPrinter
+                  targetNickname={targetNickname}
+                  duration={callDuration}
+                  onOpenTicket={handleOpenTicket}
+                />
+              </div>
+            </FadeIn>
           ) : boothStage === "idle" ? (
             <div className="text-center">
-              <p className="text-mist-white/60 text-sm mb-6">
+              <p className="mb-6 text-sm text-mist-white/60">
                 先推开门，进入时空电话亭
               </p>
               <TouchableButton onClick={handleEnterBooth}>
@@ -120,7 +141,7 @@ export const CallPage = () => {
           ) : boothStage === "inside" ? (
             <div className="text-center">
               <FadeIn>
-                <p className="text-mist-white/60 text-sm mb-6">
+                <p className="mb-6 text-sm text-mist-white/60">
                   拿起听筒，接通想念的另一端
                 </p>
               </FadeIn>
@@ -130,30 +151,6 @@ export const CallPage = () => {
             </div>
           ) : null}
         </div>
-
-        {/* 结束消息弹窗 */}
-        {showEndMessage && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-deep-space/90" />
-            <FadeIn className="relative card-base p-8 max-w-sm text-center">
-              <p className="text-xl text-moonlight mb-2">
-                你的心里话
-              </p>
-              <p className="text-xl text-moonlight mb-6">
-                时光都收到了
-              </p>
-
-              <p className="text-mist-white/60 text-sm mb-8">
-                本次通话时长：{Math.floor(callDuration / 60)}分
-                {callDuration % 60}秒
-              </p>
-
-              <TouchableButton onClick={handleContinue}>
-                查看纪念票根
-              </TouchableButton>
-            </FadeIn>
-          </div>
-        )}
       </PageTransition>
     </>
   );

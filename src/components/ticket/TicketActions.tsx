@@ -7,12 +7,16 @@ interface TicketActionsProps {
   onShare: () => void;
 }
 
-export const TicketActions = ({ onSave, onPrint, onShare }: TicketActionsProps) => {
+export const TicketActions = ({
+  onSave,
+  onPrint,
+  onShare,
+}: TicketActionsProps) => {
   return (
-    <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+    <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
       <TouchableButton
         onClick={onSave}
-        className="flex-1 flex items-center justify-center gap-2"
+        className="flex flex-1 items-center justify-center gap-2"
       >
         <DownloadIcon />
         保存图片
@@ -21,7 +25,7 @@ export const TicketActions = ({ onSave, onPrint, onShare }: TicketActionsProps) 
       <TouchableButton
         onClick={onPrint}
         variant="secondary"
-        className="flex-1 flex items-center justify-center gap-2"
+        className="flex flex-1 items-center justify-center gap-2"
       >
         <PrintIcon />
         打印票根
@@ -30,7 +34,7 @@ export const TicketActions = ({ onSave, onPrint, onShare }: TicketActionsProps) 
       <TouchableButton
         onClick={onShare}
         variant="secondary"
-        className="flex-1 flex items-center justify-center gap-2"
+        className="flex flex-1 items-center justify-center gap-2"
       >
         <ShareIcon />
         分享

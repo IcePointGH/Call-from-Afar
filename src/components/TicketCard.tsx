@@ -1,9 +1,17 @@
-import { useRef, useCallback } from "react";
+import { useCallback, useRef } from "react";
+import { motion } from "framer-motion";
 import html2canvas from "html2canvas";
 import { Ticket } from "../store/useAppStore";
 import { TicketActions } from "./ticket/TicketActions";
 import { TicketIllustration } from "./TicketIllustration";
 import { TicketBorder } from "./TicketBorder";
+import { useMotionPreferences } from "../motion/preferences";
+import {
+  motionDelays,
+  motionDurations,
+  motionEase,
+  motionSprings,
+} from "../motion/tokens";
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -18,17 +26,24 @@ const formatDuration = (seconds: number): string => {
 
 export const TicketCard = ({ ticket, onSave }: TicketCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const { allowAnimation, allowTransition } = useMotionPreferences();
+  const shouldMove = allowAnimation && allowTransition;
+
+  const captureTicket = useCallback(async () => {
+    if (!cardRef.current) return null;
+
+    return html2canvas(cardRef.current, {
+      scale: 2,
+      backgroundColor: "#0a0e1a",
+      logging: false,
+      useCORS: true,
+    });
+  }, []);
 
   const handleSave = useCallback(async () => {
-    if (!cardRef.current) return;
-
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 2,
-        backgroundColor: "#0a0e1a",
-        logging: false,
-        useCORS: true,
-      });
+      const canvas = await captureTicket();
+      if (!canvas) return;
 
       const link = document.createElement("a");
       link.download = `时空电话亭-${ticket.timestamp.replace(/[/:]/g, "-")}.png`;
@@ -39,18 +54,12 @@ export const TicketCard = ({ ticket, onSave }: TicketCardProps) => {
     } catch (error) {
       console.error("Failed to save ticket:", error);
     }
-  }, [ticket, onSave]);
+  }, [captureTicket, ticket.timestamp, onSave]);
 
   const handleShare = useCallback(async () => {
-    if (!cardRef.current) return;
-
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 2,
-        backgroundColor: "#0a0e1a",
-        logging: false,
-        useCORS: true,
-      });
+      const canvas = await captureTicket();
+      if (!canvas) return;
 
       const blob = await new Promise<Blob | null>((resolve) =>
         canvas.toBlob(resolve, "image/png")
@@ -67,16 +76,14 @@ export const TicketCard = ({ ticket, onSave }: TicketCardProps) => {
           text: `我对${ticket.targetNickname}的思念，共诉说了${ticket.duration}秒`,
         });
       } else {
-        handleSave();
+        await handleSave();
       }
     } catch {
-      handleSave();
+      await handleSave();
     }
-  }, [ticket, handleSave]);
+  }, [captureTicket, handleSave, ticket.duration, ticket.targetNickname]);
 
   const handlePrint = useCallback(() => {
-    if (!cardRef.current) return;
-
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
 
@@ -85,7 +92,7 @@ export const TicketCard = ({ ticket, onSave }: TicketCardProps) => {
       <html lang="zh-CN">
       <head>
         <meta charset="UTF-8">
-        <title>时空电话亭 · 纪念票根</title>
+        <title>时空电话亭 - 纪念票根</title>
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -134,7 +141,7 @@ export const TicketCard = ({ ticket, onSave }: TicketCardProps) => {
       <body>
         <div class="ticket">
           <div class="divider"><div class="divider-line"></div></div>
-          <h1 class="title">时空电话亭 · 跨时空告白留存</h1>
+          <h1 class="title">时空电话亭 - 跨时空告白留存</h1>
           <div class="content">
             <p class="name">亲爱的 <span class="highlight">${ticket.userNickname || "陌生人"}</span></p>
             <p class="target">对 <span class="target-name">${ticket.targetNickname}</span> 的思念，共诉说了</p>
@@ -159,53 +166,85 @@ export const TicketCard = ({ ticket, onSave }: TicketCardProps) => {
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <div
-        ref={cardRef}
+      <motion.div
         className="relative w-80 md:w-96"
+        initial={{
+          y: shouldMove ? -38 : 0,
+          rotateX: shouldMove ? -6 : 0,
+          opacity: 0,
+          filter: shouldMove ? "blur(3px)" : "blur(0px)",
+        }}
+        animate={{
+          y: 0,
+          rotateX: 0,
+          opacity: 1,
+          filter: "blur(0px)",
+        }}
+        transition={shouldMove ? motionSprings.gentle : { duration: motionDurations.instant }}
+        style={{ transformPerspective: 900, transformOrigin: "top center" }}
       >
-        <TicketBorder>
-          <div className="p-6 md:p-8" style={{ color: '#d6d6ff' }}>
-            {/* 票根插图 */}
-            <TicketIllustration />
+        <motion.div
+          className="absolute -inset-x-8 -bottom-5 h-12 rounded-full bg-accent/20 blur-2xl"
+          aria-hidden="true"
+          initial={{ opacity: 0, scaleX: 0.74 }}
+          animate={{ opacity: shouldMove ? [0, 0.46, 0.28] : 0.24, scaleX: 1 }}
+          transition={{
+            delay: shouldMove ? motionDelays.long : 0,
+            duration: shouldMove ? motionDurations.slow : motionDurations.instant,
+            ease: motionEase.softOut,
+          }}
+        />
+        <div ref={cardRef} className="relative">
+          <TicketBorder>
+            <div className="p-6 md:p-8" style={{ color: "#d6d6ff" }}>
+              <TicketIllustration />
 
-            {/* 标题 */}
-            <h2 className="text-center font-serif text-lg text-moonlight mb-6">
-              时空电话亭 · 跨时空告白留存
-            </h2>
+              <h2 className="mb-6 text-center font-serif text-lg text-moonlight">
+                时空电话亭 - 跨时空告白留存
+              </h2>
 
-            {/* 内容 */}
-            <div className="space-y-4 text-center">
-              <p className="text-mist-white">
-                亲爱的{" "}
-                <span className="text-moonlight font-medium">
-                  {ticket.userNickname || "陌生人"}
-                </span>
-              </p>
+              <div className="space-y-4 text-center">
+                <p className="text-mist-white">
+                  亲爱的{" "}
+                  <span className="font-medium text-moonlight">
+                    {ticket.userNickname || "陌生人"}
+                  </span>
+                </p>
 
-              <p className="text-mist-white/80 text-sm">
-                你对{" "}
-                <span className="text-accent">{ticket.targetNickname}</span>{" "}
-                的思念，共诉说了
-              </p>
+                <p className="text-sm text-mist-white/80">
+                  你对{" "}
+                  <span className="text-accent">{ticket.targetNickname}</span>{" "}
+                  的思念，共诉说了
+                </p>
 
-              <p className="text-3xl font-light text-moonlight">
-                {formatDuration(ticket.duration)}
-              </p>
+                <p className="text-3xl font-light text-moonlight">
+                  {formatDuration(ticket.duration)}
+                </p>
 
-              <p className="text-mist-white/50 text-xs">{ticket.timestamp}</p>
+                <p className="text-xs text-mist-white/50">{ticket.timestamp}</p>
+              </div>
+
+              <div className="mt-6 border-t border-accent/30 pt-4">
+                <p className="text-center text-sm italic text-moonlight/70">
+                  &ldquo;{ticket.message}&rdquo;
+                </p>
+              </div>
             </div>
+          </TicketBorder>
+        </div>
+      </motion.div>
 
-            {/* 寄语 */}
-            <div className="mt-6 pt-4 border-t border-accent/30">
-              <p className="text-center text-moonlight/70 text-sm italic">
-                &ldquo;{ticket.message}&rdquo;
-              </p>
-            </div>
-          </div>
-        </TicketBorder>
-      </div>
-
-      <TicketActions onSave={handleSave} onPrint={handlePrint} onShare={handleShare} />
+      <motion.div
+        initial={{ opacity: 0, y: shouldMove ? 14 : 0 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: shouldMove ? motionDurations.slow : 0,
+          duration: shouldMove ? motionDurations.base : motionDurations.instant,
+          ease: motionEase.softOut,
+        }}
+      >
+        <TicketActions onSave={handleSave} onPrint={handlePrint} onShare={handleShare} />
+      </motion.div>
     </div>
   );
 };
